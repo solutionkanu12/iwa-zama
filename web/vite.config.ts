@@ -5,8 +5,9 @@ import { nodePolyfills } from "vite-plugin-node-polyfills";
 // Iwa frontend dev/build config. Static site, no server, public Sepolia RPC only.
 // The Zama Relayer SDK (@zama-fhe/relayer-sdk) needs Node globals (Buffer/global/
 // process) in the browser, provided by vite-plugin-node-polyfills. We use the
-// SDK's prebuilt `/bundle` entry which ships its own WASM, so it is excluded from
-// dependency pre-bundling to keep Vite from trying to transform the WASM.
+// SDK's `/web` ESM entry, which resolves its own WASM via import.meta.url, so it
+// is excluded from dependency pre-bundling to keep esbuild from rewriting those
+// URLs and to keep Vite from trying to transform the WASM.
 export default defineConfig({
   plugins: [
     react(),

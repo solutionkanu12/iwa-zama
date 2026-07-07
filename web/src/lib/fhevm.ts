@@ -9,11 +9,14 @@
 //     is FHE-authorized to read (their own reliability, or an approval a lender
 //     was granted). No secret is ever revealed to anyone not on the ACL.
 //
-// The SDK's prebuilt `/bundle` entry ships its own WASM, so it works under Vite
-// without extra WASM plumbing. It is initialised once against Sepolia using the
+// We import the SDK's `/web` ESM entry (real named exports, loads its own WASM
+// via `new URL(..., import.meta.url)` which Vite serves). The `/bundle` entry is
+// only a thin shim over `window.relayerSDK` and requires the UMD script to be
+// loaded from a CDN <script> first, so it throws "reading 'initSDK' of undefined"
+// under a plain Vite build. It is initialised once against Sepolia using the
 // injected wallet as the network provider.
 
-import { initSDK, createInstance, SepoliaConfig, type FhevmInstance } from "@zama-fhe/relayer-sdk/bundle";
+import { initSDK, createInstance, SepoliaConfig, type FhevmInstance } from "@zama-fhe/relayer-sdk/web";
 import { bytesToHex, type Hex, type WalletClient } from "viem";
 import { getEthereum } from "./wallet";
 
