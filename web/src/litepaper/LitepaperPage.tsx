@@ -5,7 +5,7 @@ import styles from "./LitepaperPage.module.css";
 // gradient text, no mint, sentence case. Separate from the app and the landing
 // page; touches nothing else.
 
-const IWA_CIRCLE = "0x6873600208829a7AF5df198b6Bf51433A266baB8";
+const IWA_CIRCLE = "0xFd4B38Cf46Cf74841634596153fd9F4c8f1eD362";
 const IWA_TRUST_GATE = "0x7C494731cCb9bbEE76D60ECee45A08324e0Ca380";
 
 const META = [
