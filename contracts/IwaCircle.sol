@@ -66,6 +66,7 @@ contract IwaCircle is ZamaEthereumConfig {
     event ContributionRecorded(uint256 indexed circleId, uint32 indexed round, uint8 contributionsThisRound);
     event PayoutReleased(uint256 indexed circleId, uint32 indexed round, address indexed recipient);
     event CircleCompleted(uint256 indexed circleId);
+    event ReliabilityAccessGranted(uint256 indexed circleId, address indexed member, address indexed reader);
 
     error CircleFull();
     error AlreadyMember();
@@ -247,6 +248,28 @@ contract IwaCircle is ZamaEthereumConfig {
         address viewer
     ) external view returns (bool) {
         return FHE.isAllowed(_circles[circleId].memberInfo[member].reliability, viewer);
+    }
+
+    /**
+     * @notice Authorize `reader` to use the caller's CURRENT encrypted reliability handle in
+     *         FHE computations (e.g. a composability contract that compares it against a
+     *         threshold in encrypted space).
+     * @dev The caller (an actual member) is the only party who can extend access to their own
+     *      reliability score. This grants a persistent FHE ACL allowance on the reliability
+     *      ciphertext to `reader` — it does NOT decrypt anything and does NOT make the value
+     *      public. This is the mechanism that enables a genuine cross-contract encrypted read:
+     *      without it, the FHEVM ACL would reject any other contract's attempt to operate on
+     *      this handle.
+     *
+     *      NOTE: reliability is re-keyed to a fresh handle on each contribution, so this grant
+     *      applies to the score as of the time it is called. A reader should consume it before
+     *      the member contributes again (or the member can re-grant).
+     */
+    function grantReliabilityAccess(uint256 circleId, address reader) external {
+        Member storage m = _circles[circleId].memberInfo[msg.sender];
+        if (!m.joined) revert NotAMember();
+        FHE.allow(m.reliability, reader);
+        emit ReliabilityAccessGranted(circleId, msg.sender, reader);
     }
 
     // --- internal helpers ---
