@@ -16,7 +16,7 @@ export const IWA_CIRCLE_ADDRESS = "0xFd4B38Cf46Cf74841634596153fd9F4c8f1eD362";
 export const IWA_TRUST_GATE_ADDRESS = "0x7C494731cCb9bbEE76D60ECee45A08324e0Ca380";
 
 /** ConfidentialToken (ERC-7984): the confidential rail for contributions and payouts. */
-export const CONFIDENTIAL_TOKEN_ADDRESS = "0x8A2692c847381C0C3C00E29371D862cD5315021f";
+export const CONFIDENTIAL_TOKEN_ADDRESS = "0xEE4335082628Cdfa7C07860e919Ce4b0e4DD77FB";
 
 /** The confidential token uses 6 decimals (ERC-7984 default). */
 export const TOKEN_DECIMALS_DEFAULT = 6;
