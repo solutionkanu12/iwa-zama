@@ -8,8 +8,8 @@ import { connectWallet, WalletCancelledError } from "./lib/wallet.ts";
 
 // The single entry for both the marketing landing page and the app (Circle /
 // Browse / My standing), so a wallet connected on landing carries straight
-// into the app with no second connect step: same JS module, same
-// StellarWalletsKit instance, same connectWallet() from lib/wallet.ts.
+// into the app with no second connect step: same JS module, same MetaMask
+// connection, same connectWallet() from lib/wallet.ts.
 //
 // "/" shows the landing page. "/app" shows the app; if the visitor lands there
 // directly (no prior connect), the app's own connect gate takes over exactly

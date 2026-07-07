@@ -131,16 +131,3 @@ export async function disconnectWallet(): Promise<void> {
   // MetaMask has no programmatic disconnect; the user manages connection in the
   // extension. Nothing to clean up here.
 }
-
-/**
- * The connected wallet address is the member identity on IwaCircle. This helper
- * keeps a thin shape so callers that previously held a "member commitment" can
- * pass an address-shaped identity with minimal change.
- */
-export interface MemberIdentity {
-  address: string;
-}
-
-export function memberIdentity(address: string): MemberIdentity {
-  return { address };
-}
