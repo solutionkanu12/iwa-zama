@@ -218,6 +218,29 @@ contract IwaCircle is ZamaEthereumConfig {
     }
 
     /**
+     * @notice Whether `member` has already contributed for the current round.
+     * @dev Aggregate/mechanical bookkeeping (the member's own contribution tx is public on any
+     *      chain regardless). Reveals no encrypted amount or reliability score.
+     */
+    function hasContributedThisRound(uint256 circleId, address member) external view returns (bool) {
+        Circle storage c = _circles[circleId];
+        return c.memberInfo[member].nextRound > c.currentRound;
+    }
+
+    /**
+     * @notice Timing of the current round: when it started, its length, and its on-time deadline.
+     *         Lets a client label a contribution on-time vs late without decrypting anything.
+     */
+    function getRoundTiming(uint256 circleId)
+        external
+        view
+        returns (uint64 roundStart, uint64 roundLength, uint64 deadline)
+    {
+        Circle storage c = _circles[circleId];
+        return (c.roundStart, c.roundLength, c.roundStart + c.roundLength);
+    }
+
+    /**
      * @notice Returns the ENCRYPTED reliability handle for a member. The returned ciphertext
      *         is only decryptable by the member themselves (permissioned via FHE.allow);
      *         nobody else — including the organizer or this contract's deployer — can decrypt it.
