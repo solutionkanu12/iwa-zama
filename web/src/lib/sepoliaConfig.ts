@@ -30,9 +30,11 @@ export const DEMO_CONTRIBUTION = 50_000_000;
 
 /**
  * The circle the app reads by default. Circle ids on IwaCircle are client-chosen
- * uint256 values (creation happens on the first join). The demo uses a fixed id.
+ * uint256 values (creation happens on the first join). This points at circle 7,
+ * a real two-member circle that ran a full round live on Sepolia (see
+ * LIVE_PROOF.md): it shows a populated circle with on-chain history.
  */
-export const DEMO_CIRCLE_ID = 1;
+export const DEMO_CIRCLE_ID = 7;
 
 /** Block from which to scan CircleCreated events (the IwaCircle deploy block region). */
 export const CIRCLE_EVENTS_FROM_BLOCK = 0n;
