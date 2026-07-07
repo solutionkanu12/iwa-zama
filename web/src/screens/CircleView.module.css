@@ -1,0 +1,666 @@
+/* Flow 1, the circle view. Matched to design/iwa-prototype.html (#view-app). */
+
+/* App nav (top bar): brand + tabs + wallet chip, on a flat island. */
+.appNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px 8px 14px;
+  margin-bottom: 14px;
+}
+.navL {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.nm {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 17px;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--mist);
+  border: 0.5px solid var(--brd);
+  border-radius: 11px;
+  padding: 3px;
+  min-width: 0; /* allow the pill to shrink and scroll when tabs overflow */
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+.tab {
+  font-family: var(--font-body);
+  font-size: 13px;
+  padding: 7px 12px;
+  border-radius: 9px;
+  color: var(--mut);
+  background: transparent;
+  border: 0;
+  white-space: nowrap;
+  flex: none;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.tabActive {
+  background: var(--cloud);
+  color: var(--ink);
+  box-shadow: 0 1px 4px rgba(42, 33, 64, 0.06);
+}
+.tab:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.walletSlot {
+  display: flex;
+  justify-content: flex-end;
+  min-width: 96px;
+}
+/* Relative anchor so the dropdown can sit directly below the pill. */
+.walletMenu {
+  position: relative;
+}
+/* The address pill, now a toggle button for the wallet menu. */
+.wallet {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border: 0.5px solid var(--brd);
+  background: var(--mist);
+  border-radius: 10px;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease;
+  transform: scale(1);
+}
+.wallet:hover,
+.wallet:focus-visible {
+  border-color: var(--ink); /* deepen toward ink on hover */
+  transform: scale(0.96); /* shrink, never grow */
+}
+.wallet:active {
+  transform: scale(0.96);
+}
+.walletDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--mint);
+}
+.walletAddr {
+  font-family: var(--font-data);
+  font-size: 11px;
+  color: var(--ink);
+}
+/* Wallet dropdown: a small raised surface (never pure white) with a hairline
+ * border, holding the Disconnect action. Room for more items later. */
+.dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 140px;
+  padding: 6px;
+  background: var(--cloud);
+  border: 0.5px solid var(--brd);
+  border-radius: 12px;
+  box-shadow: var(--shadow-soft);
+  z-index: 20;
+}
+.dropdownItem {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease;
+  transform: scale(1);
+}
+.dropdownItem:hover,
+.dropdownItem:focus-visible {
+  background: var(--ink-black); /* deepen to near-black ink */
+  color: var(--cloud);
+  transform: scale(0.96); /* shrink, never grow */
+}
+.dropdownItem:active {
+  transform: scale(0.96);
+}
+
+/* Cards */
+.card {
+  padding: 20px;
+  margin-bottom: 14px;
+}
+.cardCenter {
+  text-align: center;
+  padding: 34px 22px;
+}
+.h2 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 19px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin: 0 0 4px;
+}
+.meta {
+  font-size: 13px;
+  color: var(--mut);
+  margin: 0 0 16px;
+}
+
+/* Connect gate */
+.seal {
+  width: 116px;
+  margin: 0 auto 18px;
+}
+.connectH2 {
+  margin: 0 0 8px;
+}
+.connectLede {
+  color: var(--mut);
+  font-size: 14px;
+  max-width: 30ch;
+  margin: 0 auto 20px;
+}
+
+/* Member slots: anonymous, never names */
+.slots {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 6px 0 18px;
+}
+.slot {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: var(--lav2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pop 0.4s ease both;
+}
+.slotEmpty {
+  background: var(--cloud);
+  border: 1px dashed var(--brd);
+}
+.slotYou {
+  background: var(--iris);
+}
+.slotTurn {
+  outline: 2px solid var(--iris);
+  outline-offset: 1px;
+}
+.slotTurn:not(.slotYou) {
+  background: var(--lav);
+}
+.ic {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--cloud);
+  opacity: 0.85;
+}
+.slotEmpty .ic {
+  opacity: 0.4;
+}
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Data rows */
+.rows {
+  margin: 4px 0 18px;
+}
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 0;
+  border-top: 0.5px solid var(--brd);
+}
+.row:first-child {
+  border-top: 0;
+}
+.k {
+  font-size: 14px;
+  color: var(--mut);
+}
+.v {
+  font-family: var(--font-data);
+  font-size: 13px;
+  color: var(--ink);
+}
+.vBig {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Privacy promise */
+.promise {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  background: var(--mist);
+  border: 0.5px solid var(--brd);
+  border-radius: 12px;
+  padding: 13px 14px;
+  margin-bottom: 16px;
+}
+.lk {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  margin-top: 1px;
+}
+.promiseText {
+  margin: 0;
+  font-size: 13px;
+  color: var(--mut);
+  line-height: 1.5;
+}
+
+/* Action buttons, full width stacked */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.stack button {
+  width: 100%;
+}
+
+/* Quiet mono notes */
+.mono {
+  font-family: var(--font-data);
+  font-size: 12px;
+  color: var(--mut);
+}
+.connectNote {
+  margin-top: 14px;
+}
+.protoNote {
+  text-align: center;
+  opacity: 0.7;
+  margin-top: 20px;
+}
+
+/* Connect-gate cowrie seal: slow continuous float on a short perspective */
+.cowrieSvg {
+  overflow: visible;
+  transform-origin: 50% 56%;
+  filter: drop-shadow(0 26px 30px rgba(42, 33, 64, 0.26))
+    drop-shadow(0 8px 14px rgba(109, 77, 242, 0.2));
+  animation: sealFloat 7s ease-in-out infinite;
+}
+@keyframes sealFloat {
+  0% {
+    transform: perspective(560px) rotateY(-26deg) rotateX(9deg) translateY(0);
+  }
+  50% {
+    transform: perspective(560px) rotateY(26deg) rotateX(-8deg) translateY(-13px);
+  }
+  100% {
+    transform: perspective(560px) rotateY(-26deg) rotateX(9deg) translateY(0);
+  }
+}
+
+/* Flow 2: contribute confirm + success, and the private collect confirmation. */
+.backBtn {
+  font-family: var(--font-data);
+  font-size: 12px;
+  color: var(--mut);
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin-bottom: 14px;
+  cursor: pointer;
+}
+/* Status "on time" is a good-standing signal, so it takes mint text. */
+.statusMint {
+  color: var(--mint-dk);
+}
+
+/* Create-circle form */
+.field {
+  margin-bottom: 14px;
+}
+.fieldLabel {
+  display: block;
+  font-size: 13px;
+  color: var(--mut);
+  margin-bottom: 7px;
+}
+.input {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: var(--font-data);
+  font-size: 15px;
+  color: var(--ink);
+  background: var(--mist);
+  border: 0.5px solid var(--brd);
+  border-radius: var(--radius-control);
+  padding: 11px 12px;
+  outline: none;
+  transition: border-color 160ms ease;
+}
+.input:focus {
+  border-color: var(--iris);
+}
+.inputRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.inputRow .input {
+  flex: 1;
+}
+.inputSuffix {
+  font-family: var(--font-data);
+  font-size: 13px;
+  color: var(--mut);
+}
+.choiceRow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.choice {
+  flex: 1;
+  min-width: 72px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--mist);
+  border: 0.5px solid var(--brd);
+  border-radius: var(--radius-control);
+  padding: 10px 12px;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease;
+  transform: scale(1);
+}
+.choice:hover:not(:disabled),
+.choice:focus-visible:not(:disabled) {
+  border-color: var(--ink); /* deepen toward ink on hover */
+  transform: scale(0.96); /* shrink, never grow */
+}
+.choice:active:not(:disabled) {
+  transform: scale(0.96);
+}
+.choiceActive {
+  background: var(--iris);
+  color: var(--cloud);
+  border-color: var(--iris);
+}
+.choiceActive:hover:not(:disabled),
+.choiceActive:focus-visible:not(:disabled) {
+  background: var(--ink-black); /* deepen to near-black ink */
+  border-color: var(--ink-black);
+}
+.choice:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Browse circles (discovery list) */
+.browseList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.browseRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 0.5px solid var(--brd);
+  background: var(--mist);
+  border-radius: var(--radius-control);
+  padding: 12px 14px;
+}
+.browseInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.browseAmount {
+  font-family: var(--font-data);
+  font-size: 16px;
+  color: var(--ink);
+}
+.browseSub {
+  font-size: 12px;
+  color: var(--mut);
+}
+.browseBtn {
+  flex: none;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--ink);
+  background: transparent;
+  border: 0.5px solid var(--brd);
+  border-radius: var(--radius-control);
+  padding: 8px 16px;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease;
+  transform: scale(1);
+}
+.browseBtn:hover,
+.browseBtn:focus-visible {
+  background: var(--ink-black); /* deepen to near-black ink */
+  color: var(--cloud);
+  border-color: var(--ink-black);
+  transform: scale(0.96); /* shrink, never grow */
+}
+.browseBtn:active {
+  transform: scale(0.96);
+}
+
+/* The mint confirmation check. Mint is used only here and on collect. */
+.vdot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--mint);
+  color: var(--mint-dk);
+  flex: none;
+}
+.vdotLg {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 12px;
+  animation: popCheck 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.vdotSm {
+  width: 24px;
+  height: 24px;
+}
+@keyframes popCheck {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  60% {
+    transform: scale(1.12);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.done {
+  text-align: center;
+  padding-top: 8px;
+}
+.doneMsg {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0 0 4px;
+  color: var(--ink);
+}
+.doneTx {
+  margin: 0;
+}
+.doneBack {
+  margin-top: 16px;
+}
+
+/* Private collect confirmation, shown inline on the circle card. */
+.collectConfirm {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  font-size: 14px;
+  color: var(--ink);
+  padding-top: 4px;
+}
+
+/* Flow 3 part one: the My standing record. Figures in Space Mono. */
+.bignum {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 6px 0 4px;
+}
+.bignumN {
+  font-family: var(--font-data);
+  font-weight: 700;
+  font-size: 54px;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.bignumU {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--mut);
+}
+.statline {
+  display: flex;
+  gap: 22px;
+  margin: 16px 0 4px;
+  flex-wrap: wrap;
+}
+.statN {
+  font-family: var(--font-data);
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--ink);
+}
+/* Mint only for the good-standing signals (on time, zero defaults). */
+.statGood {
+  color: var(--mint-dk);
+}
+.statL {
+  font-size: 12px;
+  color: var(--mut);
+  margin-top: 2px;
+}
+.standingSummary {
+  margin: 16px 0 18px;
+}
+
+/* Mobile: slightly taller touch targets on the smaller interactive elements
+ * (wallet pill, dropdown items, browse "View"), and a 16px input to stop iOS
+ * Safari auto-zooming on focus. Layout is unchanged, only sizing. The top
+ * tab row moves out entirely (see .bottomNav below), so the top bar keeps
+ * just the logo and the wallet pill, no cramming or scrolling needed there. */
+@media (max-width: 480px) {
+  .tabs {
+    display: none;
+  }
+  .wallet {
+    padding: 8px 10px;
+  }
+  .dropdownItem {
+    padding: 10px 12px;
+  }
+  .browseBtn {
+    padding: 10px 16px;
+  }
+  .input {
+    font-size: 16px;
+  }
+}
+
+/* Mobile bottom tab bar: a native-app-style fixed bar, hidden on desktop.
+ * Fully separate from .tabs above (the desktop top bar's own tab logic is
+ * untouched); this only duplicates the same four destinations for a
+ * touch-friendly, always-in-place mobile nav. */
+.bottomNav {
+  display: none;
+}
+@media (max-width: 480px) {
+  .bottomNav {
+    display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 30;
+    background: var(--cloud);
+    border-top: 0.5px solid var(--brd);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .bottomTab {
+    flex: 1;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: var(--mut);
+    background: transparent;
+    border: 0;
+    border-top: 2px solid transparent;
+    padding: 6px 4px;
+    text-align: center;
+  }
+  .bottomTab:disabled {
+    opacity: 0.55;
+  }
+  /* Active tab: iris label and top edge, mirroring the desktop tab's
+   * active-state intent without introducing any new color. */
+  .bottomTabActive {
+    color: var(--iris);
+    border-top-color: var(--iris);
+  }
+}
