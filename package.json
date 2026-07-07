@@ -1,0 +1,25 @@
+{
+  "name": "iwa-fhevm",
+  "version": "0.0.1",
+  "private": true,
+  "description": "FHEVM (Zama) toolchain scaffold for Iwa",
+  "scripts": {
+    "compile": "hardhat compile",
+    "deploy:sepolia": "hardhat run scripts/deploy.ts --network sepolia"
+  },
+  "devDependencies": {
+    "hardhat": "2.28.6",
+    "@nomicfoundation/hardhat-toolbox": "5.0.0",
+    "@fhevm/hardhat-plugin": "0.4.2",
+    "@fhevm/solidity": "0.11.1",
+    "@fhevm/mock-utils": "0.4.2",
+    "@zama-fhe/relayer-sdk": "0.4.1",
+    "encrypted-types": "0.0.4",
+    "@openzeppelin/confidential-contracts": "0.5.1",
+    "@openzeppelin/contracts": "5.6.1",
+    "@openzeppelin/contracts-upgradeable": "5.6.1",
+    "typescript": "5.7.3",
+    "ts-node": "10.9.2",
+    "dotenv": "16.5.0"
+  }
+}
