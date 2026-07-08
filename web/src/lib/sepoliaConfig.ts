@@ -22,11 +22,14 @@ export const CONFIDENTIAL_TOKEN_ADDRESS = "0xEE4335082628Cdfa7C07860e919Ce4b0e4D
 export const TOKEN_DECIMALS_DEFAULT = 6;
 
 /**
- * Fixed per-round contribution used by the demo, in token base units (50 IWA).
- * IwaCircle does not store a per-round amount on chain (contributions are
- * arbitrary encrypted euint64), so this is a client-side convention.
+ * Fixed per-round contribution used by the demo, in token base units: 1 IWA
+ * (1_000_000 at 6 decimals). This matches the amount each member actually
+ * contributed to circle 7 in the live two-wallet run (see LIVE_PROOF.md), so the
+ * UI reflects real on-chain state. IwaCircle does not store a per-round amount on
+ * chain (contributions are arbitrary encrypted euint64), so this is the
+ * client-side convention the app encrypts and sends.
  */
-export const DEMO_CONTRIBUTION = 50_000_000;
+export const DEMO_CONTRIBUTION = 1_000_000;
 
 /**
  * The circle the app reads by default. Circle ids on IwaCircle are client-chosen
