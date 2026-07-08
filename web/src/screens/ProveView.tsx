@@ -9,9 +9,9 @@ import styles from "./ProveView.module.css";
 // Flow 3: Prove good standing, then the Verified moment, then the lender view.
 // evaluateTrust runs an encrypted threshold check (FHE.ge) over the member's
 // encrypted reliability on Sepolia — the score itself is never revealed — then
-// user-decrypts the encrypted approval for the member. This replaces the old
-// Groth16 proof: no secret leaves the device, and only a yes/no good-standing
-// answer is produced. This is the hero screen, so the verified motion follows
+// user-decrypts the encrypted approval for the member. No secret leaves the
+// device, and only a yes/no good-standing answer is produced, computed on the
+// encrypted score. This is the hero screen, so the verified motion follows
 // the prototype exactly. If the check does not pass, an honest failure state
 // shows instead of the mint.
 

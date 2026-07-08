@@ -1,9 +1,10 @@
-// Browser polyfills for circomlibjs, imported once before anything that uses it.
+// Browser polyfills for the Zama Relayer SDK, imported once before anything that
+// uses it.
 //
-// circomlibjs (via ffjavascript and the wasm builder) expects Node's Buffer and
-// a `global` object. Vite's browser build provides neither, so we attach them to
+// The Relayer SDK and its dependencies expect Node's Buffer and a `global`
+// object. Vite's browser build provides neither, so we attach them to
 // globalThis. Only the app entry (main.tsx) imports this; the landing, litepaper,
-// and roadmap entries never load circomlibjs and stay untouched.
+// and roadmap entries never load the SDK and stay untouched.
 
 import { Buffer } from "buffer";
 

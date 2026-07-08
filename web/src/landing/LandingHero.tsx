@@ -106,7 +106,7 @@ export function LandingHero({
         </div>
         <h1 className={styles.h1}>Your good name, proven and private</h1>
         <p className={styles.sub}>
-          A savings circle on Stellar. Your everyday contributions become a
+          A savings circle on Zama's FHEVM. Your everyday contributions become a
           private proof you are reliable. Show it to anyone, reveal nothing.
         </p>
         <div className={styles.ctaRow}>

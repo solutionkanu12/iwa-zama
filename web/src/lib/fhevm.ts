@@ -1,4 +1,4 @@
-// lib/fhevm.ts — the client-side FHE seam (replaces the old ZK proof seam).
+// lib/fhevm.ts — the client-side FHE seam (encryption and user-decryption).
 //
 // Two primitives power the whole app:
 //   - encryptAmount: encrypt a contribution amount on this device into an

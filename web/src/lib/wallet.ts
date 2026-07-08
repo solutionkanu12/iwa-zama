@@ -3,7 +3,7 @@
 // connectWallet asks the injected EIP-1193 wallet (MetaMask) for an account and
 // makes sure it is on Sepolia. The connected address IS the member identity on
 // IwaCircle (reliability and membership are keyed by msg.sender), so there is no
-// separate "member commitment" the way the Stellar build had. The Relayer SDK
+// separate "member commitment" the way an earlier design had. The Relayer SDK
 // (lib/fhevm.ts) uses this same injected provider to encrypt inputs and to run
 // the EIP-712 user-decrypt flow.
 

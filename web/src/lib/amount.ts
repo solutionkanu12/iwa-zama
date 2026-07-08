@@ -1,10 +1,9 @@
 // lib/amount.ts — decimals-aware token amount formatting.
 //
-// On chain, amounts are integer base units (stroops for native XLM, which has 7
+// On chain, amounts are integer base units (the confidential token uses 6
 // decimals). The UI must always show human amounts, never raw base units. These
 // helpers convert both ways and take the token's decimals as a parameter so they
-// work for any asset (XLM = 7, stablecoins may differ). BigInt math keeps large
-// stablecoin amounts exact.
+// work for any asset. BigInt math keeps large amounts exact.
 
 /**
  * Base units -> human amount string (baseUnits / 10^decimals), trailing zeros

@@ -8,11 +8,11 @@
 // chain; each member's reliability is an encrypted counter only they can decrypt.
 //
 // Kept function names where the concept survives. Notes on the ones that changed
-// shape versus the old Stellar seam:
-//   - member identity is the wallet address, not a Poseidon commitment.
+// shape versus the earlier seam:
+//   - member identity is the wallet address.
 //   - trust-gated joins are gone; trust is a separate IwaTrustGate flow.
 //   - collect_pot is gone; payout is automatic when a round completes.
-//   - verify_proof (Groth16) becomes evaluateTrust (encrypted threshold check).
+//   - trust checks are an encrypted threshold check (evaluateTrust) on chain.
 
 import { type Hex, type WalletClient } from "viem";
 import { getPublicClient, getWalletClient } from "./wallet";
@@ -432,7 +432,7 @@ export async function grantReliabilityAccess(circleId: number, reader: string, a
  * access, runs the encrypted threshold comparison (FHE.ge) on chain, then
  * user-decrypts the encrypted approval for the caller. `grantee` (a lender) is
  * also permissioned to decrypt the result. Nothing about the score is revealed.
- * Replaces the old Groth16 verify_proof.
+ * The whole check runs on the encrypted score, with no decryption in the path.
  */
 export async function evaluateTrust(
   circleId: number,

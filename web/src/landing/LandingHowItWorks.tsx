@@ -20,7 +20,7 @@ const STEPS = [
   {
     n: "03",
     h: "Prove it, reveal nothing",
-    p: "Generate a proof of your good standing. A lender checks it on Stellar and sees only that you are reliable.",
+    p: "Generate a proof of your good standing. A lender checks it on Sepolia and sees only that you are reliable.",
   },
 ];
 

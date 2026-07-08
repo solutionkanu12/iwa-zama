@@ -16,11 +16,11 @@ import styles from "./LandingFaq.module.css";
 const FAQS = [
   {
     q: "What is a savings circle",
-    a: "A savings circle, or ajo, is a group who each put in a fixed amount every round and take turns collecting the whole pot. Iwa runs this on Stellar, so the turns and the payments are handled for you.",
+    a: "A savings circle, or ajo, is a group who each put in a fixed amount every round and take turns collecting the whole pot. Iwa runs this on Zama's FHEVM on Sepolia, so the turns and the payments are handled for you.",
   },
   {
     q: "Do I need a bank account",
-    a: "No. You need a Stellar wallet and a phone. Iwa is built for people the banks cannot see, so a bank account is never the starting point.",
+    a: "No. You need an Ethereum wallet like MetaMask and a phone. Iwa is built for people the banks cannot see, so a bank account is never the starting point.",
   },
   {
     q: "What does my proof show a lender",
@@ -37,15 +37,15 @@ const FAQS = [
   },
   {
     q: "How safe is my money",
-    a: "Contributions and payouts run through a smart contract on Stellar, so no single person holds the pot. This build runs on testnet while the contracts are finished.",
+    a: "Contributions and payouts run through smart contracts on Sepolia, so no single person holds the pot. The contracts are deployed and running on the Sepolia testnet, and the payout is released automatically when a round is fully funded.",
   },
   {
     q: "What if someone in my circle does not pay",
     a: "The circle records the missed round against that member, not against you. Your standing reflects only your own contributions, so one person cannot spend your good name.",
   },
   {
-    q: "What is zero-knowledge, in plain terms",
-    a: "It is a way to prove a statement is true without revealing the information behind it. You prove you are reliable without handing over the details that prove it.",
+    q: "What is fully homomorphic encryption, in plain terms",
+    a: "It lets the contract compute on your numbers while they stay encrypted. Your contributions and your reliability score are worked on without ever being decrypted, so you can prove you are reliable without handing over the details behind it.",
   },
 ];
 
