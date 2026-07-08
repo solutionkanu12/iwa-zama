@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Island } from "../components/Island.tsx";
 import { Button } from "../components/Button.tsx";
 import { classifyContractError, create_circle } from "../lib/iwaContract.ts";
-import { TOKEN_OPTIONS } from "../lib/sepoliaConfig.ts";
+import { TOKEN_OPTIONS, TOKEN_DECIMALS_DEFAULT } from "../lib/sepoliaConfig.ts";
 import { parseAmount } from "../lib/amount.ts";
 import styles from "./CircleView.module.css";
 
@@ -69,7 +69,7 @@ export function CreateCircleView({
   const [newId, setNewId] = useState(0);
 
   const token = TOKEN_OPTIONS.find((t) => t.id === tokenId && t.enabled) ?? null;
-  const decimals = token?.decimals ?? 7;
+  const decimals = token?.decimals ?? TOKEN_DECIMALS_DEFAULT;
   const symbol = token?.symbol ?? "";
   const busy = status === "working";
 

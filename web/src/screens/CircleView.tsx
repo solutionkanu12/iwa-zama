@@ -11,7 +11,9 @@ import {
   connectWallet,
   disconnectWallet,
   discoverWallets,
+  ensureSepoliaNetwork,
   getWalletClient,
+  onWalletEvent,
   WalletCancelledError,
   type DiscoveredWallet,
 } from "../lib/wallet.ts";
@@ -518,6 +520,27 @@ export function CircleView({
     [finishConnect],
   );
 
+  // A different account became active in the wallet. Drop every piece of
+  // per-account transient state so nothing from the previous account leaks into
+  // signing or display, then re-read the circle for the account now selected.
+  const applyAccount = useCallback(
+    async (addr: string) => {
+      setScreen("circle");
+      setContribStatus("idle");
+      setContribTx(null);
+      setContribError(null);
+      setContribOnTime(true);
+      setAlreadyPaid(false);
+      setJoinStatus("idle");
+      setJoinTx(null);
+      setJoinError(null);
+      setReputation(null);
+      setAddress(addr);
+      await finishConnect(addr);
+    },
+    [finishConnect],
+  );
+
   // Picked up an already-connected wallet from the landing page: same
   // connectWallet() seam, already run there, so there is no second connect
   // prompt here. Runs once.
@@ -550,7 +573,39 @@ export function CircleView({
     setReputation(null);
   }, []);
 
+  // Follow account and network changes from the wallet extension. This is a
+  // fund-safety guard: if the member switches the active account, every later
+  // signature and transaction must come from the account now selected, not the
+  // one captured at connect. A network change switches back to Sepolia so writes
+  // never go out on the wrong chain, then re-reads state.
+  useEffect(() => {
+    if (!address) return;
+    const offAccounts = onWalletEvent("accountsChanged", (payload) => {
+      const accounts = Array.isArray(payload) ? (payload as string[]) : [];
+      if (accounts.length === 0) {
+        void handleDisconnect();
+      } else if (accounts[0].toLowerCase() !== address.toLowerCase()) {
+        void applyAccount(accounts[0]);
+      }
+    });
+    const offChain = onWalletEvent("chainChanged", () => {
+      void (async () => {
+        try {
+          await ensureSepoliaNetwork();
+        } catch (err) {
+          console.warn("network switch back to Sepolia declined", err);
+        }
+        await finishConnect(address);
+      })();
+    });
+    return () => {
+      offAccounts();
+      offChain();
+    };
+  }, [address, handleDisconnect, applyAccount, finishConnect]);
+
   const openContribute = useCallback(() => {
+    setContribStatus("idle");
     setContribStatus("idle");
     setContribTx(null);
     setContribError(null);

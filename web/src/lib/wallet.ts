@@ -65,11 +65,46 @@ function startWalletDiscovery(): void {
   });
 }
 
+// Known non-EVM (Cosmos/Solana-first) wallets that also announce over EIP-6963.
+// Matched by name substring or reverse-DNS so they never appear in the picker,
+// even if they expose an EVM-shaped provider handle.
+const NON_EVM_NAME_HINTS = ["keplr", "leap", "cosmostation", "compass", "terra station", "station wallet"];
+const NON_EVM_RDNS = new Set([
+  "app.keplr",
+  "io.keplr",
+  "app.leapwallet",
+  "io.leapwallet.leap",
+  "io.cosmostation",
+  "org.cosmostation",
+  "io.leapwallet",
+]);
+
+function isNonEvmWallet(info: EIP6963ProviderInfo): boolean {
+  const name = (info.name ?? "").toLowerCase();
+  const rdns = (info.rdns ?? "").toLowerCase();
+  return NON_EVM_NAME_HINTS.some((h) => name.includes(h)) || NON_EVM_RDNS.has(rdns);
+}
+
+// An EVM provider answers eth_chainId (a passive read, no wallet prompt) with a
+// 0x-prefixed hex chain id. Non-EVM providers reject or return something else.
+async function isEvmProvider(provider: Eip1193Provider): Promise<boolean> {
+  try {
+    const chainId = await Promise.race([
+      provider.request({ method: "eth_chainId" }),
+      new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 1200)),
+    ]);
+    return typeof chainId === "string" && chainId.startsWith("0x");
+  } catch {
+    return false;
+  }
+}
+
 /**
- * Discover installed wallets via EIP-6963. Wallets answer the request event
+ * Discover installed EVM wallets via EIP-6963. Wallets answer the request event
  * asynchronously, so we (re)issue the request and wait briefly for the
- * announcements. Returns every wallet found. Callers handle the empty case: a
- * legacy injected window.ethereum can still be connected directly.
+ * announcements. Non-EVM wallets (Keplr and friends) are filtered out by
+ * name/rdns and by an eth_chainId probe. Callers handle the empty case: a legacy
+ * injected window.ethereum can still be connected directly.
  */
 export async function discoverWallets(waitMs = 350): Promise<DiscoveredWallet[]> {
   startWalletDiscovery();
@@ -77,7 +112,11 @@ export async function discoverWallets(waitMs = 350): Promise<DiscoveredWallet[]>
     window.dispatchEvent(new Event("eip6963:requestProvider"));
   }
   await new Promise((resolve) => setTimeout(resolve, waitMs));
-  return [...announcedWallets.values()];
+
+  const candidates = [...announcedWallets.values()].filter((w) => !isNonEvmWallet(w.info));
+  // Keep only providers that actually speak EVM (respond to eth_chainId).
+  const evmFlags = await Promise.all(candidates.map((w) => isEvmProvider(w.provider)));
+  return candidates.filter((_, i) => evmFlags[i]);
 }
 
 /** Thrown when the visitor dismisses the wallet prompt, so the UI can stay on the gate. */
@@ -191,4 +230,34 @@ export async function disconnectWallet(): Promise<void> {
   // connection in the extension. Forget the chosen provider so a fresh connect
   // can pick a different wallet.
   selectedProvider = null;
+}
+
+/**
+ * Subscribe to a wallet event on the currently connected provider:
+ *   - "accountsChanged" fires (with a string[] of accounts) when the member
+ *     switches the active account in their extension. The app must follow it so
+ *     every later signature and transaction uses the account now selected, not
+ *     the one captured at connect time.
+ *   - "chainChanged" fires (with a hex chain id) when they switch networks.
+ * Returns an unsubscribe function. No-op if nothing is connected or the provider
+ * does not emit events.
+ */
+export function onWalletEvent(
+  event: "accountsChanged" | "chainChanged",
+  handler: (payload: unknown) => void,
+): () => void {
+  const eth = selectedProvider;
+  if (!eth?.on) return () => {};
+  eth.on(event, handler);
+  return () => eth.removeListener?.(event, handler);
+}
+
+/**
+ * Best-effort: make sure the connected wallet is back on Sepolia. Called after a
+ * chainChanged so writes never go out on the wrong network. Idempotent; returns
+ * immediately if already on Sepolia.
+ */
+export async function ensureSepoliaNetwork(): Promise<void> {
+  if (!selectedProvider) return;
+  await ensureSepolia(selectedProvider);
 }
