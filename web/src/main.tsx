@@ -4,38 +4,26 @@ import { createRoot } from "react-dom/client";
 import "./styles/global.css";
 import { App } from "./App.tsx";
 import { LandingPage } from "./landing/LandingPage.tsx";
-import { connectWallet, WalletCancelledError } from "./lib/wallet.ts";
 
 // The single entry for both the marketing landing page and the app (Circle /
-// Browse / My standing), so a wallet connected on landing carries straight
-// into the app with no second connect step: same JS module, same MetaMask
-// connection, same connectWallet() from lib/wallet.ts.
+// Browse / My standing). "Enter the circle" navigates to the app, where the
+// connect gate handles wallet selection (the EIP-6963 wallet picker lives
+// there, so the member chooses which wallet to connect rather than the landing
+// page silently grabbing window.ethereum).
 //
-// "/" shows the landing page. "/app" shows the app; if the visitor lands there
-// directly (no prior connect), the app's own connect gate takes over exactly
-// as before. Litepaper and roadmap remain separate, untouched entries.
+// "/" shows the landing page. "/app" shows the app and its connect gate.
+// Litepaper and roadmap remain separate, untouched entries.
 function AppRoot() {
   const [view, setView] = useState<"landing" | "app">(() =>
     window.location.pathname.startsWith("/app") ? "app" : "landing",
   );
-  const [address, setAddress] = useState<string | null>(null);
 
-  const onEnterCircle = useCallback(async () => {
-    try {
-      const addr = await connectWallet();
-      setAddress(addr);
-      setView("app");
-      window.history.pushState(null, "", "/app");
-    } catch (err) {
-      // A cancelled modal or declined connection: stay on the landing page,
-      // no broken state.
-      if (!(err instanceof WalletCancelledError)) {
-        console.warn("wallet connect failed", err);
-      }
-    }
+  const onEnterCircle = useCallback(() => {
+    setView("app");
+    window.history.pushState(null, "", "/app");
   }, []);
 
-  if (view === "app") return <App address={address} />;
+  if (view === "app") return <App />;
   return <LandingPage onEnterCircle={onEnterCircle} />;
 }
 

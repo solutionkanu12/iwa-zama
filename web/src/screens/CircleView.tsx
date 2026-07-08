@@ -10,8 +10,10 @@ import {
 import {
   connectWallet,
   disconnectWallet,
+  discoverWallets,
   getWalletClient,
   WalletCancelledError,
+  type DiscoveredWallet,
 } from "../lib/wallet.ts";
 import {
   DEMO_CIRCLE_ID,
@@ -423,6 +425,12 @@ export function CircleView({
   const [connecting, setConnecting] = useState(false);
   const [circle, setCircle] = useState<Circle | null>(null);
 
+  // Installed wallets discovered via EIP-6963, so the member picks one instead
+  // of the app grabbing whichever extension won the window.ethereum race.
+  const [wallets, setWallets] = useState<DiscoveredWallet[]>([]);
+  const [walletsLoading, setWalletsLoading] = useState(true);
+  const [connectingId, setConnectingId] = useState<string | null>(null);
+
   const [screen, setScreen] = useState<Screen>("circle");
   const [contribStatus, setContribStatus] = useState<Status>("idle");
   const [contribTx, setContribTx] = useState<string | null>(null);
@@ -473,22 +481,42 @@ export function CircleView({
     [loadPaidStatus],
   );
 
-  const handleConnect = useCallback(async () => {
-    setConnecting(true);
-    let addr: string;
-    try {
-      addr = await connectWallet();
-    } catch (err) {
-      // A cancelled modal is expected: stay on the connect gate, no crash.
-      if (!(err instanceof WalletCancelledError)) {
-        console.warn("wallet connect failed", err);
+  // Discover installed wallets when the connect gate is showing.
+  useEffect(() => {
+    if (address) return;
+    let active = true;
+    setWalletsLoading(true);
+    discoverWallets().then((found) => {
+      if (!active) return;
+      setWallets(found);
+      setWalletsLoading(false);
+    });
+    return () => {
+      active = false;
+    };
+  }, [address]);
+
+  const handleConnect = useCallback(
+    async (wallet?: DiscoveredWallet) => {
+      setConnecting(true);
+      setConnectingId(wallet?.info.uuid ?? "default");
+      let addr: string;
+      try {
+        addr = await connectWallet(wallet);
+      } catch (err) {
+        // A cancelled modal is expected: stay on the connect gate, no crash.
+        if (!(err instanceof WalletCancelledError)) {
+          console.warn("wallet connect failed", err);
+        }
+        setConnecting(false);
+        setConnectingId(null);
+        return;
       }
-      setConnecting(false);
-      return;
-    }
-    setAddress(addr);
-    await finishConnect(addr);
-  }, [finishConnect]);
+      setAddress(addr);
+      await finishConnect(addr);
+    },
+    [finishConnect],
+  );
 
   // Picked up an already-connected wallet from the landing page: same
   // connectWallet() seam, already run there, so there is no second connect
@@ -509,6 +537,7 @@ export function CircleView({
     setAddress(null);
     setCircle(null);
     setConnecting(false);
+    setConnectingId(null);
     setScreen("circle");
     setContribStatus("idle");
     setContribTx(null);
@@ -633,16 +662,44 @@ export function CircleView({
         </div>
         <h2 className={`${styles.h2} ${styles.connectH2}`}>Join the circle</h2>
         <p className={styles.connectLede}>
-          Connect your wallet to see the circle and claim your spot.
+          {wallets.length > 1
+            ? "Choose a wallet to see the circle and claim your spot."
+            : "Connect your wallet to see the circle and claim your spot."}
         </p>
         <div className={styles.stack}>
-          <Button onClick={handleConnect} disabled={connecting}>
-            {connecting ? "Connecting" : "Connect wallet"}
-          </Button>
+          {walletsLoading ? (
+            <Button disabled>Detecting wallets</Button>
+          ) : wallets.length > 0 ? (
+            wallets.map((w) => (
+              <Button
+                key={w.info.uuid}
+                onClick={() => handleConnect(w)}
+                disabled={connecting}
+              >
+                <img
+                  src={w.info.icon}
+                  alt=""
+                  aria-hidden="true"
+                  width={18}
+                  height={18}
+                  style={{
+                    verticalAlign: "middle",
+                    marginRight: "8px",
+                    borderRadius: "4px",
+                  }}
+                />
+                {connecting && connectingId === w.info.uuid
+                  ? "Connecting"
+                  : `Connect ${w.info.name}`}
+              </Button>
+            ))
+          ) : (
+            <Button onClick={() => handleConnect()} disabled={connecting}>
+              {connecting ? "Connecting" : "Connect wallet"}
+            </Button>
+          )}
         </div>
-        <p className={`${styles.mono} ${styles.connectNote}`}>
-          Sepolia testnet · MetaMask
-        </p>
+        <p className={`${styles.mono} ${styles.connectNote}`}>Sepolia testnet</p>
       </Island>
     );
   } else if (screen === "browse") {
